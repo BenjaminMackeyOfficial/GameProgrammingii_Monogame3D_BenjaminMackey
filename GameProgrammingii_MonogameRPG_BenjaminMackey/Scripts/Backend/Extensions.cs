@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GameProgrammingii_MonogameRPG_BenjaminMackey
 {
@@ -30,7 +26,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
 
         public static double Rad(this double num)
         {
-            return num*Math.PI/180.0;
+            return num * Math.PI / 180.0;
         }
         public static float Rad(this float num)
         {
@@ -38,7 +34,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
         }
         public static double Deg(this double num)
         {
-            return num *  180.0 / Math.PI;
+            return num * 180.0 / Math.PI;
         }
         public static float Deg(this float num)
         {
@@ -80,8 +76,8 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
                 if (stuff[x][y] == target)
                     return new Vector2(x, y);
             }
-            return new Vector2(-1, -1);
+            return new Vector2(-10, -10);
         }
-        
+
     }
 }

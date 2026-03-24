@@ -2,17 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Metrics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
 {
     public static class EnemyInfoBin
     {
         public static GameObject _player = new GameObject();
-        
+
         public static List<Vector3> _PlayerPosHistory = new List<Vector3>();
     }
 
@@ -38,7 +34,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
         }
         private void TickDown(bool b)
         {
-            if(queDestroy > 0)
+            if (queDestroy > 0)
             {
                 if (queDestroy == 1) bomberObject.Destroy();
                 queDestroy--;
@@ -48,11 +44,11 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
             if (_counter == 0)
             {
                 Explode();
-               
+
             }
             //Debug.WriteLine(queDestroy);
         }
-        private void Explode( (Collider hit, Collider other) stuff)
+        private void Explode((Collider hit, Collider other) stuff)
         {
             if (stuff.other._gameObject.CheckTag("pickup")) return;
             exploded = true;
@@ -69,7 +65,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
     //the move horizontally straight across the track
     public class Blockade
     {
-    
+
         public GameObject blockadeObject;
         public Blockade(GameObject obj)
         {
@@ -85,15 +81,15 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
         public Transform targTransform;
         public Shadower(GameObject obj)
         {
-            
+
 
         }
         public void UpdateTransformPos(Vector3 pos)
         {
-            
+
         }
     }
-    
+
 
     //driving styles
     //
@@ -111,7 +107,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
                 obj.AddComponent(Instance);
                 return _instance;
             }
- 
+
         }
 
 
@@ -133,8 +129,8 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
             Collider collider = new Collider(new Vector2(0, 0), true);
             collider._static = false;
             SpriteRenderer sprite = new SpriteRenderer(SpriteBin.GetSprite(spriteName), new Vector2(1, 1), SpriteRenderer.RenderFrom.Centre);
-            
-            
+
+
             enemy.AddComponent(sprite);
             enemy.AddComponent(collider);
 
@@ -170,7 +166,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
             EnemyAIController enemyAIController = new EnemyAIController();
             enemyAIController._searchDistance = 30000f;
             enemyAIController._self = enemy._transform;
-            enemyAIController._target = EnemyInfoBin._player._transform; 
+            enemyAIController._target = EnemyInfoBin._player._transform;
             enemyAIController._movmentStrategy = new AgressiveMovmentStrategy();
 
             TransformController transformController = new TransformController(enemyAIController, new Vector2InputMap(true), 30f);
@@ -180,21 +176,21 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
             bombers.Add(new Bomber(enemy, 150));
         }
 
-        public void CreateBlockade(Vector3 pos,Vector3 scale)
+        public void CreateBlockade(Vector3 pos, Vector3 scale)
         {
             GameObject enemy = CreateGeneralEnemyTemplate(pos, "stop");
             enemy._transform._scale = scale;
 
             enemy.AddTag("blockade");
 
-            bool result = enemy._components.Remove(enemy.GetComponent<Collider>());
-            
+            bool result = enemy._components.Remove(typeof(Collider));
+
 
             PlaneColider planeCoider = new PlaneColider(new Vector2(0, 0));
             enemy.AddComponent(planeCoider);
-            
+
             EnemyAIController enemyAIController = new EnemyAIController();
-            
+
             enemyAIController._searchDistance = 20000f;
             enemyAIController._self = enemy._transform;
             enemyAIController._target = EnemyInfoBin._player._transform; //not permanent, add general enemy info bin 
@@ -209,11 +205,11 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
 
             blockades.Add(new Blockade(enemy));
         }
-        public void CreateRandom(Vector3 pos,Vector3 scale)
+        public void CreateRandom(Vector3 pos, Vector3 scale)
         {
             Random random = new Random();
             int num = random.Next(3);
-            switch(num)
+            switch (num)
             {
                 case 0:
                     CreateBlockade(pos, scale); break;

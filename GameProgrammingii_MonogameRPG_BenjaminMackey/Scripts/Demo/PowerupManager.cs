@@ -1,9 +1,5 @@
 ﻿using GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Backend;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
 {
@@ -12,7 +8,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
     //extend into boost pickup
     //mario star type thing
     //heal ability
-    public class Pickup: Component
+    public class Pickup : Component
     {
         public virtual void Effect(CarController that)
         {
@@ -28,10 +24,10 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
             obj._transform._position = position;
             obj._transform._scale = new Vector3(500, 500, 500);
 
-            SpriteRenderer sprite = new SpriteRenderer(SpriteBin.GetSprite("nos"), new Vector2(1,1), SpriteRenderer.RenderFrom.Centre);
+            SpriteRenderer sprite = new SpriteRenderer(SpriteBin.GetSprite("nos"), new Vector2(1, 1), SpriteRenderer.RenderFrom.Centre);
             obj.AddComponent(sprite);
 
-            Collider col = new Collider(new Vector2(0,0), true);
+            Collider col = new Collider(new Vector2(0, 0), true);
             col._static = false;
             obj.AddComponent(col);
             obj.AddTag("pickup");
@@ -100,15 +96,19 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
     internal class PickupManager
     {
         private static PickupManager _instance;
-        public static PickupManager Instance { get { 
-            if(_instance == null) _instance = new PickupManager(); return _instance;
-            } }
+        public static PickupManager Instance
+        {
+            get
+            {
+                if (_instance == null) _instance = new PickupManager(); return _instance;
+            }
+        }
 
         public Pickup MakeRandomPickup(Vector3 pos)
         {
             Random random = new Random();
             int rnd = random.Next(3);
-            switch(rnd)
+            switch (rnd)
             {
                 case 0: return new NitrosBottle(pos);
                 case 1: return new Heal(pos);

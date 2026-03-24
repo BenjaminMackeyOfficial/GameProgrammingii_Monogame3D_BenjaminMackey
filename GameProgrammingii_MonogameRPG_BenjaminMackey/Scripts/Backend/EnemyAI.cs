@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 
 namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Backend
 {
@@ -41,15 +36,15 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Backend
     {
         public Vector2 MoveTo(EnemyAIController parent)
         {
-            if (parent._target == null || parent._self == null) return new Vector2(0,0);
+            if (parent._target == null || parent._self == null) return new Vector2(0, 0);
             Vector3 movePos = parent._target._position - parent._self._position;
-            
-            if(movePos.Magnitude() > parent._searchDistance) return new Vector2(0,0);
+
+            if (movePos.Magnitude() > parent._searchDistance) return new Vector2(0, 0);
             return Vector2.Normal(new Vector2(movePos.x, movePos.z));
         }
     }
 
-  
+
     public class SlideOnPlaneMovmentStrategy : IMovmentStrategy
     {
         public Plane lockTo;
@@ -61,20 +56,20 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Backend
         }
         public Vector2 MoveTo(EnemyAIController parent)
         {
-            
+
             if (parent._target == null || parent._self == null) return new Vector2(0, 0);
             Vector3 movePos = parent._target._position - parent._self._position;
-            
+
 
             if (movePos.Magnitude() > parent._searchDistance) return new Vector2(0, 0);
-            
+
             Vector2 pos = new Vector2(0, 0);
             switch (lockTo)
             {
                 case Plane.xy:
                     pos = Vector2.Normal(new Vector2(movePos.x, 0));
                     curDist += (float)pos.x;
-                
+
                     if (curDist > maxDist || curDist < -maxDist) return new Vector2(0, 0);
                     break;
 
@@ -89,5 +84,5 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Backend
         }
     }
 
-    
+
 }

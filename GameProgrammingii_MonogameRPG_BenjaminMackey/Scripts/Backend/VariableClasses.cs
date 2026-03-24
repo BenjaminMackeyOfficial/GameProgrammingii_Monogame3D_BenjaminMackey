@@ -1,12 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameProgrammingii_MonogameRPG_BenjaminMackey
 {
@@ -27,15 +19,15 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
         public double z;
         public Vector3(double x, double y, double z)
         {
-            this.x = x; 
-            this.y = y; 
+            this.x = x;
+            this.y = y;
             this.z = z;
         }
 
         public static Vector3 RotatePositionAroundWorldPoint(Vector3 startPos, Vector3 worldPoint, Vector3 rotation) // used for POSITION VECTOR 3S
         {
             Vector3 vec = startPos;
-            
+
             double radianAngle;
             double cosTheta;
             double sinTheta;
@@ -51,7 +43,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
             temp2 = vec.y - worldPoint.y;
             vec.x = (cosTheta * temp1 - sinTheta * temp2) + worldPoint.x;
             vec.y = (sinTheta * temp1 + cosTheta * temp2) + worldPoint.y;
-            
+
             //ZX-------------------------------------
             radianAngle = rotation.y * Math.PI / 180.0;
             cosTheta = Math.Cos(radianAngle);
@@ -80,7 +72,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
             double dirZ = right.z.Rad() - left.z.Rad();
 
             return new Vector3(
-                Math.Atan2(dirY ,Math.Sqrt(dirX * dirX + dirZ * dirZ)),
+                Math.Atan2(dirY, Math.Sqrt(dirX * dirX + dirZ * dirZ)),
                 Math.Atan2(dirZ, dirX).Deg(),
                 0
                 );
@@ -123,7 +115,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
         {
             float divBY = (float)Math.Sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
             if (divBY == 0) return Vector3.Zero();
-            return new Vector3( vec.x / divBY, vec.y / divBY, vec.z / divBY );
+            return new Vector3(vec.x / divBY, vec.y / divBY, vec.z / divBY);
         }
         public static Vector3 Mirror(Vector3 toMirror, Vector3 mirrorOffOf)
         {
@@ -138,7 +130,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
             num = num.Clamp(0f, 1f);
             return left + (right - left) * num;
         }
-        public static Vector3 operator  +(Vector3 left, Vector3 right)
+        public static Vector3 operator +(Vector3 left, Vector3 right)
         {
             return new Vector3(left.x + right.x, left.y + right.y, left.z + right.z);
         }
@@ -156,7 +148,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
         }
         public static Vector3 operator -(Vector3 left)
         {
-            return new Vector3(-left.x, -left.y , -left.z);
+            return new Vector3(-left.x, -left.y, -left.z);
         }
         public static Vector3 operator *(Vector3 left, Vector3 right)
         {
@@ -188,7 +180,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
             return !(left == right);
         }
 
-        
+
     }
     public struct Vector2
     {
@@ -213,7 +205,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
         }
         public static Vector2 operator -(Vector2 left)
         {
-            return new Vector2(-left.x , -left.y);
+            return new Vector2(-left.x, -left.y);
         }
         public static Vector2 Normal(Vector2 vec)
         {
@@ -221,7 +213,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
             if (divBY == 0) return new Vector2(0, 0);
             return new Vector2(vec.x / divBY, vec.y / divBY);
         }
-        public static bool operator==(Vector2 left, Vector2 right)
+        public static bool operator ==(Vector2 left, Vector2 right)
         {
             if (left.x == right.x && left.y == right.y) return true;
             return false;
@@ -231,7 +223,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
             return !(left == right);
         }
 
-        
+
     }
 
     //behold, vector one

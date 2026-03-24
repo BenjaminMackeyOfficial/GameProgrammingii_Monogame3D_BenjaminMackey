@@ -1,10 +1,5 @@
-﻿using System;
+﻿using GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Demo;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Backend
 {
@@ -26,9 +21,9 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Backend
         public static void FufillPhysicsRequests()
         {
 
-            List<Vector3> collidingWith;
+            List<Vector3> collidingWith = new List<Vector3>();
 
-                           //For the future for when i implement the correct math (need to switch rotation to matrix)
+            //For the future for when i implement the correct math (need to switch rotation to matrix)
             float xUp;
             float xLow;
 
@@ -37,28 +32,33 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Backend
 
             float zUp;
             float zLow;
-                              //---------------------------------------------------//
+            //---------------------------------------------------//
 
 
             for (int i = 0; i < moveQue.Count; i++)
             {
+
+
                 //per OBJECT-------------------------------------------------------------------------
                 Transform curEnd = moveQue[i].end;
-                collidingWith = new List<Vector3>();//list of everything its coliding with or would be after bounce
+                if ((curEnd._position - GameManager.Instance.player._transform._position).Magnitude() > 10000) continue;
 
+
+                collidingWith.Clear();//list of everything its coliding with or would be after bounce
+                Collider col = moveQue[i].parent.GetComponent<Collider>();
 
                 //temp
                 collidingWith.Add(moveQue[i].end._position);
                 //--
                 if (!ObjectManager._gameObjects.Contains(moveQue[i].parent)) continue;//making sure the game object is still there
-                
+
                 for (int j = 0; j < moveQue.Count; j++)
                 {
                     if (i == j) continue;
-                    
+
                     Transform checkEnd = moveQue[j].end;
                     PlaneColider checkCol = moveQue[j].parent.GetComponent<PlaneColider>();
-                    Collider col = moveQue[i].parent.GetComponent<Collider>();
+
 
 
                     if (col != null && col._static)
@@ -70,27 +70,23 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Backend
 
                     Collider other = moveQue[j].parent.GetComponent<Collider>();
                     if (col != null && other != null && Transform.CheckOverlapRadius(moveQue[i].end, checkEnd))//checking for other colider
-                    { 
+                    {
                         col.TriggerEnter(other);
                         other.TriggerEnter(col);
                     }
 
-                   
 
-                    Vector3 newPos = moveQue[i].end._position;
                     float dist = (float)(curEnd._position - moveQue[i].parent._transform._position).Magnitude();
 
                     if (checkCol != null && col != null)
                     {
-                        Vector3 reflected = Transform.ReflectOff(checkCol._plane,curEnd,checkEnd);
+                        Vector3 reflected = Transform.ReflectOff(checkCol._plane, curEnd, checkEnd);
                         // if reflection happened
                         if (reflected != new Vector3(99854, 99854, 99854))
                         {
                             col.TriggerEnter(checkCol);//trigger event
-
                             Vector3 direction = Vector3.Normalize(reflected);
-                            newPos = moveQue[i].begin._position + direction * (dist);
-
+                            Vector3 newPos = moveQue[i].begin._position + direction * (dist);
                             collidingWith.Add(newPos);
                             //Debug.WriteLine(moveQue[i].begin._position.x + " " + moveQue[i].begin._position.y + " " + moveQue[i].begin._position.z + " -> " +newPos.x + " " + newPos.y + " " + newPos.z);
                         }
@@ -111,7 +107,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Backend
                 */
 
                 //lock it in!
-                
+
                 moveQue[i].parent.FlushTransform(new Transform(collidingWith[collidingWith.Count - 1],
                     moveQue[i].end._rotation,
                     moveQue[i].end._scale

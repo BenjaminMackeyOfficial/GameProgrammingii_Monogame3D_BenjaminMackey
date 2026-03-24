@@ -1,9 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Backend
 {
@@ -14,7 +10,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Backend
         private static int _IDindex = 0;
         public static int Add(Texture2D texture, string Filename)
         {
-            if(GetSprite(Filename) != null) return -1;
+            if (GetSprite(Filename) != null) return -1;
 
             _sprites.Add(new SpriteLookupData(texture, Filename, _IDindex));
             _IDindex++;

@@ -1,24 +1,19 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using System.Windows.Input;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace GameProgrammingii_MonogameRPG_BenjaminMackey
 {
-    
+
     public static class InputManager
     {
-        
+
 
         private static List<Updatable> _inputActions = new List<Updatable>();
 
-        
-        public static void ActivateInputAction(Updatable action) 
+
+        public static void ActivateInputAction(Updatable action)
         {
             _inputActions.Add(action);
         }
@@ -28,9 +23,16 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
         }
         public static void updateAll()
         {
-            foreach (Updatable item in _inputActions)
+            try
             {
-                item.Update();
+                foreach (Updatable item in _inputActions)
+                {
+                    item.Update();
+                }
+            }
+            catch
+            {
+
             }
         }
 
@@ -39,14 +41,14 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
     //overarching class==================
     public class InputAction : Updatable
     {
-        
+
         public InputAction()
         {
             InputManager.ActivateInputAction(this);
         }
         public virtual void Update()
         {
-        
+
         }
     }
 
@@ -63,10 +65,10 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
         public Vector2InputMap(ButtonAction up, ButtonAction down, ButtonAction right, ButtonAction left)
         {
             InputManager.ActivateInputAction(this);
-            if(up != null) _up = up;
-            if(down != null) _down = down;
-            if(right != null) _right = right;
-            if(left != null) _left = left;
+            if (up != null) _up = up;
+            if (down != null) _down = down;
+            if (right != null) _right = right;
+            if (left != null) _left = left;
         }
         public Vector2InputMap(bool empty)
         {
@@ -79,11 +81,11 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
         }
         public virtual void Update()
         {
-            Vector2 tmp = new Vector2(0,0);
+            Vector2 tmp = new Vector2(0, 0);
             if (_right._isHeld) tmp.x += 1;
             if (_down._isHeld) tmp.y -= 1;
             if (_left._isHeld) tmp.x -= 1;
-            if(_up._isHeld) tmp.y += 1;
+            if (_up._isHeld) tmp.y += 1;
 
             //for when i add joystick control
             tmp.y = tmp.y.Clamp(-1, 1);
@@ -138,7 +140,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
         public ButtonAction(ConsoleKey[] keys)
         {
             if (keys != null) ConsoleKeys = keys;
-        
+
         }
         public ButtonAction(ConsoleKey key)
         {
@@ -153,14 +155,14 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
             {
                 _pressedThisFrame = false;
                 _releasedThisFrame = false;
-                if( GetAsyncKeyState((int)key) < 0 && _isHeld == false)
+                if (GetAsyncKeyState((int)key) < 0 && _isHeld == false)
                 {
                     _isHeld = true;
                     _pressedThisFrame = true;
                     _state = KeyState.Down;
                     inputted();
                 }
-                else if(GetAsyncKeyState((int)key) >= 0 && _isHeld == true)
+                else if (GetAsyncKeyState((int)key) >= 0 && _isHeld == true)
                 {
                     _isHeld = false;
                     _releasedThisFrame = true;

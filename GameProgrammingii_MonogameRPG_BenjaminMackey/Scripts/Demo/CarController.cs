@@ -1,11 +1,8 @@
 ﻿using GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable;
 using GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Backend;
+using GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Demo;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameProgrammingii_MonogameRPG_BenjaminMackey
 {
@@ -41,11 +38,9 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
 
             float boostBarSize = (barSize * boostPercent);
             float healthBarSize = (barSize * healthPercent);
-            
 
-           
             _boostMeter._transform._position = new Vector3(10 + barSize * 2, 10, 0);
-            _boostMeter._transform._scale = new Vector3(boostBarSize, 0.1f,0);
+            _boostMeter._transform._scale = new Vector3(boostBarSize, 0.1f, 0);
 
             _healthMeter._transform._position = new Vector3(10 + barSize * 2, 140, 0);
             _healthMeter._transform._scale = new Vector3(healthBarSize, 0.1f, 0);
@@ -66,7 +61,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
 
         private ScreenUiForCar _screenUiForCar;
 
-        
+
 
 
         private GameObject BuildFollowCam()
@@ -77,28 +72,29 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
             CameraObj._name = "TestCam";
 
             Camera cam = new Camera(40f, 1000f);
+            cam._renderDistance = 100000;
 
             RenderController._camera = cam;
             RenderController._cameraTransform = CameraObj._transform; //somehow make this auto searching with gameobject updating
-            
+
             return CameraObj;
         }
 
         private SpriteRenderer CreateCarRenderer()
         {
-            SpriteRenderer carRenderer = new SpriteRenderer(SpriteBin.GetSprite("TempCar"), new Vector2(1,1), SpriteRenderer.RenderFrom.Centre);
+            SpriteRenderer carRenderer = new SpriteRenderer(SpriteBin.GetSprite("TempCar"), new Vector2(1, 1), SpriteRenderer.RenderFrom.Centre);
             return carRenderer;
         }
 
         private Collider CreateCarColider()
         {
-            Collider collider = new Collider(new Vector2(0,0), false);
+            Collider collider = new Collider(new Vector2(0, 0), false);
             collider._static = false;
             return collider;
 
         }
 
-        public bool queDamage=false;
+        public bool queDamage = false;
 
         private void ColliderHit((Collider self, Collider other) data)
         {
@@ -106,26 +102,28 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
 
             if (collision.GetComponent<PlaneColider>() != null)
             {
-                
                 speed = -speed * 0.8f;
             }
             if (collision.CheckTag("enemy"))
             {
                 if (collision.CheckTag("bomber")) ForceTakeDamage(int.MaxValue);
-
                 if (boosting == true && boostInTank > 0f) collision.Destroy();
                 else queDamage = true;
             }
-            else if(collision.CheckTag("pickup"))
+            else if (collision.CheckTag("pickup"))
             {
                 Debug.WriteLine("col = " + collision.GetComponent<Pickup>());
                 collision.GetComponentAmbig<Pickup>().Effect(this);
                 collision.Destroy();
             }
-            
+            else if (collision.CheckTag("CheckPoint"))
+            {
+                GameManager.Instance.HitNext(collision);
+                Debug.WriteLine("haaaalp");
+            }
 
         }
-        
+
         public void ForceTakeDamage(float dmg)
         {
             if (invFrames > 0) return;
@@ -135,7 +133,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
         private GameObject _map;
         public override void Initialize()
         {
-             _map = ObjectManager.FindObjectByTag("map");
+            _map = ObjectManager.FindObjectByTag("map");
             if (_map != null) _gameObject._transform._position = _map.GetComponent<Map>()._playerSpawn;
 
             _cam = BuildFollowCam();
@@ -153,7 +151,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
             _screenUiForCar = new ScreenUiForCar();
             //_map.GetComponent<Map>().TellEnemiesHeyImOverHere(_gameObject);
         }
-        
+
 
 
         public bool boosting = false;
@@ -165,10 +163,10 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
         public float _aeroFactor = 1.001f;
         public float _rollingResistance = 1.01f;
 
-        public float _bodyStifness = 100f; 
+        public float _bodyStifness = 100f;
 
-        private float turn= 0f;
-        
+        private float turn = 0f;
+
         private float speed = 0f;
         public float boostInTank = 0f;
 
@@ -185,7 +183,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
 
             if (_boostKey._isHeld && boostInTank > 0) speed += _boostMult * _acceleration;
 
-            turn = (-(float)_baseControls.x * _bodyStifness ).Clamp(-_maxTurn, _maxTurn);
+            turn = (-(float)_baseControls.x * _bodyStifness).Clamp(-_maxTurn, _maxTurn);
         }
         //
         private void moveCar() //go set up a propper move method or somehting in wherever
@@ -208,7 +206,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
             _acceleration = 0;
             _bodyStifness = 0;
             _maxSpeed = 0;
-            _gameObject.GetComponent<SpriteRenderer>()._spriteSheet = SpriteBin.GetSprite("eplodedCar");
+            GameManager.Instance.LoadLoseScreen();
         }
         private float framegenTimeEqv = 0.01f; //ask simon about
 
@@ -219,6 +217,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
         //
         public override void Update()
         {
+            if (GameManager.Instance.playing == false) return;
             adjustCarInputValues();
             moveCar();
             //Debug.WriteLine("speed = " + speed + ", turn = " + turn);
@@ -226,7 +225,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
             float focalMod = 0.5f + (float)Math.Sin((speed / _maxSpeed) / 2f);
             //Debug.WriteLine(speed);
             if (_boostKey._isHeld)
-            { 
+            {
                 boosting = true;
                 boostInTank -= 0.5f;
             }
@@ -245,18 +244,18 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
             }
             //Debug.WriteLine(health);
             health = health.Clamp(0f, 100f);
-            invFrames = (invFrames-1).Clamp(0,100);
+            invFrames = (invFrames - 1).Clamp(0, 100);
             queDamage = false;
 
 
             _screenUiForCar.AdjustUiMeters(health / 100f, boostInTank / 40f);
-            
-            _cameraOffset = new Vector3(0, 400, -700 * focalMod );
+
+            _cameraOffset = new Vector3(0, 400, -700 * focalMod);
             Vector3 angleSet = -_gameObject._attemptedTransform._rotation; //make it feel livley in the future
             Vector3 adjPos = _gameObject._attemptedTransform._position + _cameraOffset;
-            _cam._transform._position = Vector3.RotatePositionAroundWorldPoint(adjPos,_gameObject._attemptedTransform._position, angleSet);
+            _cam._transform._position = Vector3.RotatePositionAroundWorldPoint(adjPos, _gameObject._attemptedTransform._position, angleSet);
             _cam._transform._rotation = Vector3.LookAtRotation(_gameObject._attemptedTransform._position - _cam._transform._position) + angleoffset;
-            
+
         }
     }
 }

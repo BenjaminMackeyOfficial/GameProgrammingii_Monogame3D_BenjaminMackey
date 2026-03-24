@@ -3,11 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
 {
@@ -25,10 +20,12 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
         private int _itemSpawnRate = 7;
 
         public Vector3 _playerSpawn;
+
+        public List<GameObject> checkPoints;
         //some utilty stuff
         private GameObject MakePylon(Vector3 pos)
         {
-            SpriteRenderer spriteRenderer = new SpriteRenderer(SpriteBin.GetSprite("pylon"), new Vector2(1,1), SpriteRenderer.RenderFrom.Centre);
+            SpriteRenderer spriteRenderer = new SpriteRenderer(SpriteBin.GetSprite("pylon"), new Vector2(1, 1), SpriteRenderer.RenderFrom.Centre);
             GameObject cone = new GameObject();
             cone._transform._position = pos;
             cone._transform._scale = new Vector3(400, 400, 400);
@@ -38,8 +35,8 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
         }
         private GameObject MakeColider(Vector3 pos, Vector2 rotationVector)
         {
-            Vector3 rot = new Vector3(0,0,0);
-            Vector3 scale = new Vector3(500,_scale, _scale);
+            Vector3 rot = new Vector3(0, 0, 0);
+            Vector3 scale = new Vector3(500, _scale, _scale);
             if (rotationVector.y != 0)
             {
                 scale = new Vector3(_scale, _scale, 500);
@@ -66,7 +63,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
             enemy._transform._position = pos;
             enemy._transform._scale = new Vector3(200, 200, 200); //random number
             enemy.AddTag("enemy");
-            Collider collider = new Collider(new Vector2(0,0), true);
+            Collider collider = new Collider(new Vector2(0, 0), true);
             collider._static = false;
             SpriteRenderer sprite = new SpriteRenderer(SpriteBin.GetSprite("Leoreo"), new Vector2(1, 1), SpriteRenderer.RenderFrom.Centre);
 
@@ -78,15 +75,15 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
             enemyAIController._movmentStrategy = new AgressiveMovmentStrategy();
 
             TransformController transformController = new TransformController(enemyAIController, new Vector2InputMap(true), 100f);
-            
+
             enemy.AddComponent(transformController);
             enemy.AddComponent(sprite);
             enemy.AddComponent(collider);
-            return enemy; 
+            return enemy;
         }
         private Vector2[] GetOtherDirections(Vector2[] directions)
         {
-            Vector2[] PossibleDirections = 
+            Vector2[] PossibleDirections =
             {
                 new Vector2(1,0),
                 new Vector2(-1,0),
@@ -99,7 +96,7 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
             {
                 for (int j = 0; j < PossibleDirections.Length; j++)
                 {
-                    if (directions[i] == PossibleDirections[j]) PossibleDirections[j] = new Vector2(-5,-5);
+                    if (directions[i] == PossibleDirections[j]) PossibleDirections[j] = new Vector2(-5, -5);
                 }
             }
             foreach (Vector2 item in PossibleDirections)
@@ -109,9 +106,29 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
             return builtTable.ToArray();
         }
 
+        private GameObject MakeCheckpoint()
+        {
+            GameObject checkPoint = new GameObject();
+            checkPoint._transform._scale = new Vector3(_scale, _scale, _scale);
+
+            SpriteRenderer spriteRenderer = new SpriteRenderer(
+                SpriteBin.GetSprite("CheckPoint"),
+                new Vector2(1, 1),
+                SpriteRenderer.RenderFrom.Centre
+                );
+            checkPoint.AddComponent(spriteRenderer);
+
+            Collider col = new Collider(new Vector2(0, 0), true);
+            col._static = false;
+            checkPoint.AddComponent(col);
+
+            checkPoint.AddTag("CheckPoint");
+            checkPoint._active = false;
+            return checkPoint;
+        }
 
         //cordinates are the number of nums in the file x2000 world cordinates, starting from the middle of the tile
-        private void BuildTile(Vector2 currentTilePos, Vector2 lastWall, Vector2 nextWall)
+        private void BuildTile(Vector2 currentTilePos, Vector2 lastWall, Vector2 nextWall, bool skipCheck)
         {
 
             Vector2 dir1 = Vector2.Normal(lastWall - currentTilePos);
@@ -120,10 +137,16 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
             Vector2[] temp = { dir1, dir2 };
             Vector2[] wallDirections = GetOtherDirections(temp);
 
-            
+            if (!skipCheck)
+            {
+                GameObject chkPoint = MakeCheckpoint();
+                chkPoint._transform._position = new Vector3(currentTilePos.x * _scale, 0, currentTilePos.y * _scale);
+                checkPoints.Add(chkPoint);
+            }
+
 
             //temp enemy spawning----
-            if(dir1 == -dir2 && rand.Next(0,10) < _enemySpawnRate)
+            if (dir1 == -dir2 && rand.Next(0, 10) < _enemySpawnRate)
             {
                 Vector3 pos = new Vector3(currentTilePos.x * _scale, 0, currentTilePos.y * _scale);
 
@@ -132,20 +155,21 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
                 {
                     scale = new Vector3(501, 501, 500);
                 }
-                if((_playerSpawn - pos).Magnitude() > 10000f) EnemyManager.Instance.CreateRandom(pos, scale);
+                if ((_playerSpawn - pos).Magnitude() > 10000f) EnemyManager.Instance.CreateRandom(pos, scale);
 
             }
+
             //-----------------------
 
             //items------------------
-            if(rand.Next(0,10) < _itemSpawnRate)
+            if (rand.Next(0, 10) < _itemSpawnRate)
             {
                 Vector3 pos = new Vector3(currentTilePos.x * _scale, 0, currentTilePos.y * _scale);
                 PickupManager.Instance.MakeRandomPickup(pos);
             }
             //-----------------------
 
-            for (int i = 0; i <2; i++)
+            for (int i = 0; i < 2; i++)
             {
                 //Debug.WriteLine(wallDirections[i].x + " " +wallDirections[i].y);
 
@@ -155,20 +179,21 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
                 _colliders.Add(MakeColider(vec3WallPos, wallDirections[i]));
 
 
-                Vector3 tangent = new Vector3(-wallDirections[i].y, 0,wallDirections[i].x);
+                Vector3 tangent = new Vector3(-wallDirections[i].y, 0, wallDirections[i].x);
 
                 for (int j = 0; j < _pylonsPerWall; j++)
                 {
                     float offset = -0.5f + ((float)j / _pylonsPerWall);
-                    Debug.WriteLine(offset);
-                    MakePylon((vec3WallPos + (tangent * offset) * _scale) + new Vector3(0,-700,0));
+
+                    MakePylon((vec3WallPos + (tangent * offset) * _scale) + new Vector3(0, -700, 0));
                     //the pylon would be made in here
                 }
             }
+
         }
-       
-        
-        
+
+
+
         private Vector2 FindTile(List<int[]> map, int target)
         {
             for (int x = 0; x < map.Count; x++)
@@ -177,24 +202,30 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
                 {
                     if (map[x][y] == target) return new Vector2(x, y);
                 }
-            }    
+            }
             return new Vector2(-1, -1);
         }
         private void SetUpMap(List<int[]> cordinateData)
         {
+
+            checkPoints = new List<GameObject>();
+
             Vector2 searchBounds = new Vector2(1, 1);
             Vector2 newFocus = new Vector2(0, 0);
             Vector2 curentFocus = new Vector2(0, 0); //will start off as the start position ()
             Vector2 lastFocus = new Vector2(0, 0);
 
-            
+
             curentFocus = FindTile(cordinateData, 4); //temp
 
             _playerSpawn = new Vector3(curentFocus.x * _scale, 0, curentFocus.y * _scale);
 
             newFocus = new Vector2(curentFocus.x + 1, curentFocus.y);
             lastFocus = new Vector2(curentFocus.x - 1, curentFocus.y);
-            BuildTile(curentFocus, lastFocus, newFocus);
+
+
+
+            BuildTile(curentFocus, lastFocus, newFocus, true);
 
             GameObject test = new GameObject();
             SpriteRenderer bostMeeterUi = new SpriteRenderer(SpriteBin.GetSprite("solidBlackSquare"), new Vector2(1, 1), SpriteRenderer.RenderFrom.Centre);
@@ -211,16 +242,19 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
                 counter++;
                 newFocus = cordinateData.DigThrouh2D(curentFocus, lastFocus, 1, searchBounds);
 
-                if (newFocus.x == -1 && newFocus.y == -1)break;
+                if (newFocus.x == -10 && newFocus.y == -10) break;
+                Debug.WriteLine(newFocus.x + " " + newFocus.y);
+                if (counter % 10 == 0) BuildTile(curentFocus, lastFocus, newFocus, false);
+                else BuildTile(curentFocus, lastFocus, newFocus, true);
 
-                BuildTile(curentFocus, lastFocus, newFocus);
 
                 lastFocus = curentFocus;
                 curentFocus = newFocus;
-                //Debug.WriteLine(curentFocus.x + " " + curentFocus.y);
+
             }
             newFocus = cordinateData.DigThrouh2D(curentFocus, lastFocus, 4, searchBounds);
-            BuildTile(curentFocus, lastFocus, newFocus);
+            BuildTile(curentFocus, lastFocus, newFocus, true);
+            Debug.WriteLine("counter = " + counter);
         }
         public Map(string fileName, int mapScale) //one in the future will let you pick time of day and like background and whatnot
         {
@@ -241,12 +275,14 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey.Scripts.Adjustable
 
             _scale = mapScale;
             SetUpMap(cordinateData);
+
+            //GameManager.Instance.checkpoints = checkPoints.ToArray();
         }
         public void TellEnemiesHeyImOverHere(GameObject targ)
         {
             foreach (GameObject item in _enemies)
             {
-                EnemyAIController cont= (EnemyAIController)item.GetComponent<TransformController>()._moveInputMap;
+                EnemyAIController cont = (EnemyAIController)item.GetComponent<TransformController>()._moveInputMap;
                 cont._target = targ._transform;
             }
         }
