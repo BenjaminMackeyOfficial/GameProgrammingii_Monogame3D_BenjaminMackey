@@ -36,8 +36,8 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
             RenderController.UpdateRenderVariables(_graphics);
 
 
-
-            GameManager.Instance.LoadStartScreen();
+            TechDemoTests.Instance.testMethod();
+            //GameManager.Instance.LoadStartScreen();
         }
 
         protected override void LoadContent()

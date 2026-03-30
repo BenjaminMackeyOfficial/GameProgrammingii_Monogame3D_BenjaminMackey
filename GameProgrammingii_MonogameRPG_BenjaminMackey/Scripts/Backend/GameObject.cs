@@ -464,6 +464,31 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
 
     }
 
+    public class ShapeRenderer : Component
+    {
+        public Triangle[] _triangles = new Triangle[0];
+
+        public ShapeRenderer()
+        {
+
+        }
+        public ShapeRenderer(Triangle t)
+        {
+            _triangles = new Triangle[0];
+            _triangles[0] = t;
+        }
+
+        public void AddTriangle(Triangle t)
+        {
+            Triangle[] n = new Triangle[_triangles.Length];
+            for (int i = 0; i < _triangles.Length; i++)
+            {
+                n[i] = _triangles[i];
+            }
+            n[n.Length - 1] = t;
+        }
+    }
+
     public class AnimatedTrackSpriteRenderer : SpriteRenderer, Updatable
     {
         public int _FPS;

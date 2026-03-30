@@ -8,6 +8,16 @@ namespace GameProgrammingii_MonogameRPG_BenjaminMackey
      - this is because i am not smart enough to write quaternions into this, maybe one day.
     */
     public enum Plane { xy, yz, zx }
+    public class Triangle
+    {
+        public Vector3[] _vertecies = new Vector3[2];
+        public Triangle(Vector3 v1, Vector3 v2, Vector3 v3) 
+        { 
+            _vertecies[0] = v1;
+            _vertecies[1] = v2;
+            _vertecies[2] = v3;
+        }
+    }
     public struct Vector3
     {
         public enum Rotations
